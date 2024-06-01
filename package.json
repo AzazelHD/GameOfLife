@@ -1,0 +1,15 @@
+{
+  "name": "gameoflife",
+  "version": "0.1.0",
+  "description": "Game of Life minigame",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite"
+  },
+  "author": "",
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "vite": "^5.2.12"
+  }
+}
