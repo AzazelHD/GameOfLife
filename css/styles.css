@@ -41,7 +41,8 @@ h1 {
   justify-content: center;
   align-items: center;
   margin-top: 20px;
-  gap: 10px; /* Espacio entre elementos */
+  gap: 10px;
+  /* Espacio entre elementos */
 }
 
 button {
@@ -88,7 +89,8 @@ button:active {
 
 /* Style for the slider itself */
 #speed {
-  appearance: none; /* Remove default styling */
+  appearance: none;
+  /* Remove default styling */
   width: 200px;
   height: 8px;
   background: var(--button-bg);
@@ -123,4 +125,36 @@ button:active {
   color: var(--text-color);
   font-size: 16px;
   margin-left: 10px;
+}
+
+
+#debug {
+  display: none;
+  position: absolute;
+  flex-direction: column;
+  padding: .4rem;
+  gap: .4rem;
+  top: 0;
+  left: 0;
+  align-items: stretch;
+  z-index: 1;
+
+  >div {
+    display: flex;
+    font-size: .8rem;
+  }
+
+  .name {
+    display: inline-block;
+    width: 2rem;
+    text-align: right;
+
+  }
+
+  .counter {
+    display: flex;
+    width: 2rem;
+    justify-content: flex-end;
+    margin-right: .4rem;
+  }
 }

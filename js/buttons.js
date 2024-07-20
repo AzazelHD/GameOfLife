@@ -2,6 +2,14 @@ import { grid, resetGrid, play, getTicks, setTicks } from "./script.js";
 
 let playing = false;
 let timer;
+function checkDebug() {
+  if(window.location.hash === "#debug") {
+    document.getElementById("debug").style.display = "flex";
+  }
+  
+}
+
+
 
 export function buttonsHandler() {
   const startButton = document.getElementById("start");
@@ -24,6 +32,7 @@ export function buttonsHandler() {
   }
 
   startButton.onclick = function () {
+    checkDebug();
     playing = !playing;
     randomButton.disabled = true;
     if (playing) {

@@ -104,13 +104,26 @@ export function copyGrid() {
 }
 
 export function play() {
+const start = performance.now();
   grid.forEach((row, i) => {
     row.forEach((_, j) => {
       applyRules(i, j);
     });
   });
+  
   copyGrid();
+  const endLogic = performance.now();
   updateBoard();
+  const endrender = performance.now();
+  const timeLogic=endLogic-start;
+  const timeRender=endrender-endLogic;
+  const timeTotal=endrender-start;
+  
+  document.querySelector("#logic").textContent = `${timeLogic.toFixed(2)}`;
+  document.querySelector("#css").textContent = `${timeRender.toFixed(2)}`;
+  document.querySelector("#total").textContent = `${timeTotal.toFixed(2)}`;
+  
+  
 }
 
 export function getTicks() {
