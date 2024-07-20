@@ -1,80 +1,124 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const gameBoard = document.getElementById("game-board");
-  const startButton = document.getElementById("start");
-  const pauseButton = document.getElementById("pause");
-  const resetButton = document.getElementById("reset");
-  let cells = [];
-  let interval;
+import { buttonsHandler } from "./buttons.js";
 
-  const createBoard = () => {
-    for (let i = 0; i < 100; i++) {
-      const cell = document.createElement("div");
+const rows = 40;
+const cols = 90;
+const cellSize = 15;
+
+let ticks = 100;
+
+export const grid = new Array(rows);
+export const nextGrid = new Array(rows);
+
+function initGame() {
+  initializeBoard();
+  buttonsHandler();
+}
+
+function initializeBoard() {
+  const table = document.getElementById("life-board");
+  for (let i = 0; i < rows; i++) {
+    const row = document.createElement("tr");
+    grid[i] = new Array(cols);
+    nextGrid[i] = new Array(cols);
+    for (let j = 0; j < cols; j++) {
+      const cell = document.createElement("td");
       cell.classList.add("cell");
-      cell.addEventListener("click", () => {
+      cell.style.width = `${cellSize}px`;
+      cell.style.height = `${cellSize}px`;
+      cell.onclick = () => {
         cell.classList.toggle("alive");
-      });
-      gameBoard.appendChild(cell);
-      cells.push(cell);
+        grid[i][j].alive = cell.classList.contains("alive");
+      };
+      grid[i][j] = { cell: cell, alive: false };
+      nextGrid[i][j] = { cell: cell, alive: false };
+      row.appendChild(cell);
     }
-  };
+    table.appendChild(row);
+  }
+}
 
-  const getNextState = () => {
-    return cells.map((cell, i) => {
-      const isAlive = cell.classList.contains("alive");
-      const neighbors = getAliveNeighbors(i);
-      if (isAlive && (neighbors === 2 || neighbors === 3)) return true;
-      if (!isAlive && neighbors === 3) return true;
-      return false;
+export function resetGrid() {
+  grid.forEach((row) =>
+    row.forEach((cell) => {
+      cell.cell.classList.remove("alive");
+      cell.alive = false;
+    })
+  );
+}
+
+export function updateBoard() {
+  grid.forEach((row) =>
+    row.forEach((cell) => {
+      cell.cell.classList.toggle("alive", cell.alive);
+    })
+  );
+}
+
+function countLiveNeighbors(row, col) {
+  let count = 0;
+
+  const neighbors = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ];
+
+  neighbors.forEach(([i, j]) => {
+    const newRow = (row + i + rows) % rows;
+    const newCol = (col + j + cols) % cols;
+
+    if (grid[newRow][newCol].alive) count++;
+  });
+
+  return count;
+}
+
+function applyRules(row, col) {
+  const liveNeighbors = countLiveNeighbors(row, col);
+
+  // Rule 1 - Revive
+  if (!grid[row][col].alive && liveNeighbors === 3) {
+    nextGrid[row][col].alive = true;
+  }
+  // Rule 2 - Die
+  else if (grid[row][col].alive && (liveNeighbors < 2 || liveNeighbors > 3)) {
+    nextGrid[row][col].alive = false;
+  }
+  // Rule 3 - Stay Alive or remain Dead
+  else {
+    nextGrid[row][col].alive = grid[row][col].alive;
+  }
+}
+
+export function copyGrid() {
+  grid.forEach((row, i) => {
+    row.forEach((_, j) => {
+      grid[i][j] = { ...nextGrid[i][j] };
     });
-  };
+  });
+}
 
-  const getAliveNeighbors = (index) => {
-    const row = Math.floor(index / 10);
-    const col = index % 10;
-    let aliveCount = 0;
-    for (let r = -1; r <= 1; r++) {
-      for (let c = -1; c <= 1; c++) {
-        if (r === 0 && c === 0) continue;
-        const neighborRow = row + r;
-        const neighborCol = col + c;
-        if (
-          neighborRow >= 0 &&
-          neighborRow < 10 &&
-          neighborCol >= 0 &&
-          neighborCol < 10
-        ) {
-          const neighborIndex = neighborRow * 10 + neighborCol;
-          if (cells[neighborIndex].classList.contains("alive")) {
-            aliveCount++;
-          }
-        }
-      }
-    }
-    return aliveCount;
-  };
-
-  const updateBoard = () => {
-    const nextState = getNextState();
-    cells.forEach((cell, i) => {
-      if (nextState[i]) {
-        cell.classList.add("alive");
-      } else {
-        cell.classList.remove("alive");
-      }
+export function play() {
+  grid.forEach((row, i) => {
+    row.forEach((_, j) => {
+      applyRules(i, j);
     });
-  };
-
-  startButton.addEventListener("click", () => {
-    interval = setInterval(updateBoard, 1000);
   });
+  copyGrid();
+  updateBoard();
+}
 
-  pauseButton.addEventListener("click", () => {
-    clearInterval(interval);
-  });
+export function getTicks() {
+  return ticks;
+}
 
-  resetButton.addEventListener("click", () => {
-    cells.forEach((cell) => cell.classList.remove("alive"));
-  });
+export function setTicks(newTicks) {
+  ticks = newTicks;
+}
 
-  createBoard();
-});
+document.addEventListener("DOMContentLoaded", initGame);
